@@ -24,7 +24,7 @@ github_username: reposefulGrass
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-console
+remote_theme: reposefulGrass/jekyll-theme-console
 plugins:
   - jekyll-feed
 
