@@ -7,17 +7,18 @@ categories: RACTF
 
 ## RACTF Reversing | Snakes and Ladders
 
-The encrypt flag is `fqtbjfub4uj_0_d00151a52523e510f3e50521814141c`. We must reverse engineer the encryption they used to encrypt the flag and use it to built a decryption method.
 
-Studying the encryption method they give us, the flag is split into two parts, the `end_text` and `hex_xored`. 
+They give us an encrypted flag: `fqtbjfub4uj_0_d00151a52523e510f3e50521814141c` and the function they used to encrypt it. We must reverse engineer the function and build another function that decrypts the flag they gave us so we can obtain the real flag. 
+
+Studying the encryption function, we see that the flag is split into two parts: `end_text` and `hex_xored`. 
 
 | fqtbjfub4uj_0_d | 00151a52523e510f3e50521814141c |
 | :-------------: | :----------------------------: |
 |    end_text     |           hex_xored            |
 
-The algorithm they use for the encryption separates the original flag (unencrypted) into the previous two parts by skipping every other letter. Essentially, `end_text` is a list of all the even characters, and `hex_xored` is a list of all the odd characters. 
+The algorithm they use for the encryption separates the unencrypted flag into the previous two parts by skipping every other letter. Essentially, `end_text` is a list of all the even characters, and `hex_xored` is a list of all the odd characters. 
 
-`hex_xored` is obtained after running every odd character through the function below with the argument a string of `a`'s. Then the result is turned into a list of hex numbers.
+`hex_xored` is obtained after running every odd character through the function below with the argument a string of `a`'s. Then the result is turned into a list of hex numbers (which doubles its length).
 
 ```python
 def xor (s1, s2):
@@ -30,12 +31,12 @@ Since `hex_xored` is a list of hex numbers, we have to convert that to a list of
 
 ```python
 hex_xored = "00151a52523e510f3e50521814141c"
-hex_xored = [hex_xored[i: i+2] for i in range(0, len(hex_xored), 2)] 
-chars_xored = [chr(int(ch, base=16)) for ch in hex_xored] 
+hex_xored = [hex_xored[i: i+2] for i in range(0, len(hex_xored), 2)] # group into pairs 
+chars_xored = [chr(int(ch, base=16)) for ch in hex_xored] # convert to chars
 xor("aaaaaaaaaaaaaaaa", chars_xored)
 ```
 
-The result of the last expression is list of every odd character in the original flag (unencrypted). 
+The result of the last expression is list of every odd character in the decrypted flag. 
 
 Now, to decrypt `end_text`.
 
@@ -50,18 +51,19 @@ for ch in end_text:
     result += shifted_ch
 ```
 
-The above code will decrypt `end_text` into a list of the even characters of the original flag (unencrypted).
+The above code will decrypt `end_text` into a list of the even characters of the decrypted flag.
 
 ```python
-for a, b in zip(end_text_decrpyed, hex_xored_decrypted):
+for a, b in zip(end_text_decrpyted, hex_xored_decrypted):
     print(f'{a}{b}', end='')
 ```
 
-Finally, this code above will give the flag.
+Finally, this code above will combine both texts to give us the flag.
 
 Combining all of the previous code snippets together results in the following decryption function:
 
 ```python
+
 def xor (s1, s2):
     return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
 
@@ -98,6 +100,4 @@ def decrypt (msg):
     
 decrypt("fqtbjfub4uj_0_d00151a52523e510f3e50521814141c")
 ```
-
-
 
