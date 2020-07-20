@@ -1,7 +1,7 @@
 ---
-layout: 	post
-title: 		"RACTF Writeup | Snakes and Ladders"
-date: 		2020-07-19 10:07:00
+layout:     post
+title:      "RACTF Writeup | Snakes and Ladders"
+date:       2020-07-19 10:07:00
 categories: RACTF
 ---
 
@@ -21,7 +21,7 @@ The algorithm they use for the encryption separates the original flag (unencrypt
 
 ```python
 def xor (s1, s2):
-	return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
+    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
 ```
 
 If something is encrypted with xor, like so: `c = xor(a, b)`, then we can retrieve `b` with: `b = xor(a, c)`. 
@@ -43,18 +43,18 @@ Looking at the algorithm, it seems to be a simple shifting cipher with the shift
 
 ```python
 for ch in end_text:
-	if ch >= 'a' and c <= 'z':
-		shifted_ch = chr(ord(ch) - randnum)
-		if shifted_ch < 'a':
-			shifted_ch = chr(ord(shifted_ch) + 26)
-	result += shifted_ch
+    if ch >= 'a' and c <= 'z':
+        shifted_ch = chr(ord(ch) - randnum)
+        if shifted_ch < 'a':
+            shifted_ch = chr(ord(shifted_ch) + 26)
+    result += shifted_ch
 ```
 
 The above code will decrypt `end_text` into a list of the even characters of the original flag (unencrypted).
 
 ```python
 for a, b in zip(end_text_decrpyed, hex_xored_decrypted):
-	print(f'{a}{b}', end='')
+    print(f'{a}{b}', end='')
 ```
 
 Finally, this code above will give the flag.
@@ -63,39 +63,39 @@ Combining all of the previous code snippets together results in the following de
 
 ```python
 def xor (s1, s2):
-	return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
+    return ''.join(chr(ord(a) ^ ord(b)) for a, b in zip(s1, s2))
 
 def shift (msg, key):
-	result = ""
+    result = ""
 
-	for ch in msg:
-		if ch >= 'a' and ch <= 'z':
-			shifted_ch = chr(ord(ch) - key)
-			if shifted_ch < 'a':
-				shifted_ch = chr(ord(shifted_ch) + 26)
-		result += shifted_ch
+    for ch in msg:
+        if ch >= 'a' and ch <= 'z':
+            shifted_ch = chr(ord(ch) - key)
+            if shifted_ch < 'a':
+                shifted_ch = chr(ord(shifted_ch) + 26)
+        result += shifted_ch
 
-	return result
+    return result
 
 def decrypt (msg):
-	length = len(msg)
-	split = int(length / 3)
-		
-	part1 = msg[:split]
-	part2 = msg[split:]
-	
-	hex_xored = [part2[i:i+2] for i in range(0, len(part2), 2)]
-	chars_xored = [chr(int(ch, base=16)) for ch in hex_xored]
-	
-	part2_decrypted = xor("a" * length, chars_xored)
-	
-	randnum = 14
-	part1_decrypted = shift(part1, randnum)
-	
-	for a, b, in zip(part1_decrypted, part2_decrypted):
-		print(f'{a}{b}', end='')
-	print()
-	
+    length = len(msg)
+    split = int(length / 3)
+        
+    part1 = msg[:split]
+    part2 = msg[split:]
+    
+    hex_xored = [part2[i:i+2] for i in range(0, len(part2), 2)]
+    chars_xored = [chr(int(ch, base=16)) for ch in hex_xored]
+    
+    part2_decrypted = xor("a" * length, chars_xored)
+    
+    randnum = 14
+    part1_decrypted = shift(part1, randnum)
+    
+    for a, b, in zip(part1_decrypted, part2_decrypted):
+        print(f'{a}{b}', end='')
+    print()
+    
 decrypt("fqtbjfub4uj_0_d00151a52523e510f3e50521814141c")
 ```
 
